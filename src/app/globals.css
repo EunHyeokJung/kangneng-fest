@@ -12,6 +12,10 @@
   --container-max-w: 768px;
   --container-inline-padding: clamp(16px, 4vw, 24px);
   --section-block-padding: clamp(12px, 2.5vw, 16px);
+  /* Brand tokens */
+  --brand-start: #fee6f4;
+  --brand-end: #7a7cde;
+  --brand-gradient: linear-gradient(135deg, var(--brand-start) 0%, var(--brand-end) 100%);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -59,19 +63,19 @@
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  /* Sky theme accents */
-  --primary: #0ea5e9; /* sky-500 */
-  --primary-foreground: #f8fafc; /* slate-50 */
-  --secondary: oklch(0.968 0.007 247.896);
+  /* Brand theme accents */
+  --primary: var(--brand-end);
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.98 0.01 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
+  --muted: oklch(0.975 0.008 247.896);
   --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: #e0f2fe; /* sky-100 */
-  --accent-foreground: #0c4a6e; /* sky-900 */
+  --accent: var(--brand-start);
+  --accent-foreground: #2c2e59;
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
-  --ring: #38bdf8; /* sky-400 */
+  --ring: var(--brand-end);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -79,12 +83,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.984 0.003 247.858);
   --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: #0ea5e9; /* sky-500 */
-  --sidebar-primary-foreground: #f8fafc;
-  --sidebar-accent: #e0f2fe; /* sky-100 */
-  --sidebar-accent-foreground: #0c4a6e; /* sky-900 */
+  --sidebar-primary: var(--brand-end);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--brand-start);
+  --sidebar-accent-foreground: #2c2e59;
   --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: #38bdf8; /* sky-400 */
+  --sidebar-ring: var(--brand-end);
 }
 
 .dark {
@@ -94,9 +98,9 @@
   --card-foreground: oklch(0.984 0.003 247.858);
   --popover: oklch(0.208 0.042 265.755);
   --popover-foreground: oklch(0.984 0.003 247.858);
-  /* Sky accents in dark */
-  --primary: #38bdf8; /* sky-400 */
-  --primary-foreground: #030712; /* gray-950 */
+  /* Brand accents in dark */
+  --primary: #9aa2ff; /* lighter brand end for dark surfaces */
+  --primary-foreground: #0b0f19;
   --secondary: oklch(0.279 0.041 260.031);
   --secondary-foreground: oklch(0.984 0.003 247.858);
   --muted: oklch(0.279 0.041 260.031);
@@ -106,7 +110,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: #0ea5e9; /* sky-500 */
+  --ring: #9aa2ff;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -114,12 +118,12 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.208 0.042 265.755);
   --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: #38bdf8; /* sky-400 */
-  --sidebar-primary-foreground: #030712;
+  --sidebar-primary: #9aa2ff;
+  --sidebar-primary-foreground: #0b0f19;
   --sidebar-accent: oklch(0.279 0.041 260.031);
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #0ea5e9; /* sky-500 */
+  --sidebar-ring: #9aa2ff;
 }
 
 @layer base {
@@ -137,6 +141,7 @@ body {
   -webkit-tap-highlight-color: transparent;
   text-size-adjust: 100%;
   overscroll-behavior-y: none;
+  overflow: hidden; /* prevent document scroll; scroll inside content area */
 }
 
 /* Safe-area helpers for iOS devices */
@@ -156,7 +161,16 @@ body {
 
 /* Content area offsets for fixed header/bottom nav */
 .content-area {
-  padding-top: var(--header-height);
-  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  /* place the scroll area between fixed header and bottom nav */
+  margin-top: var(--header-height);
+  margin-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   padding-block: var(--section-block-padding);
+}
+
+/* Brand gradient helper */
+.bg-brand-gradient {
+  background-image: var(--brand-gradient);
 }

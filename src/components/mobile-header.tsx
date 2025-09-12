@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/mode-toggle";
 
 type NavItem = {
   href: string;
@@ -50,8 +51,7 @@ export function MobileHeader({ title }: { title?: string }) {
           {title ?? "ALL STAR"}
         </div>
 
-        {/* Right side spacer for symmetry */}
-        <div className="w-9" />
+        <ModeToggle />
       </div>
     </header>
   );

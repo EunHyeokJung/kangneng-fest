@@ -1,46 +1,70 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { usePathname, useRouter } from "next/navigation";
 import { CalendarDays, MapPin, Home, Store, Megaphone } from "lucide-react";
 import clsx from "clsx";
 
 type Item = {
-  href: string;
+  value: string; // href
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
 const items: Item[] = [
-  { href: "/", label: "홈", icon: Home },
-  { href: "/schedule", label: "일정", icon: CalendarDays },
-  { href: "/map", label: "지도", icon: MapPin },
-  { href: "/booths", label: "주점", icon: Store },
-  { href: "/notices", label: "공지", icon: Megaphone },
+  { value: "/", label: "홈", icon: Home },
+  { value: "/schedule", label: "일정", icon: CalendarDays },
+  { value: "/map", label: "지도", icon: MapPin },
+  { value: "/booths", label: "주점", icon: Store },
+  { value: "/notices", label: "공지", icon: Megaphone },
 ];
+
+function activeValueFromPath(pathname: string): string {
+  const match = items.find((it) => it.value !== "/" && pathname.startsWith(it.value));
+  return match ? match.value : "/";
+}
 
 export function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const active = activeValueFromPath(pathname);
+
   return (
-    <nav className="safe-pl safe-pr safe-pb fixed inset-x-0 bottom-0 z-40 border-t bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="container-inline flex h-[var(--bottom-nav-height)] items-stretch justify-between">
-        {items.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || (href !== "/" && pathname.startsWith(href));
-          return (
-            <Link
-              key={href}
-              href={href}
+    <nav
+      role="navigation"
+      aria-label="하단 내비게이션"
+      className="safe-pl safe-pr safe-pb fixed inset-x-0 bottom-0 z-40 border-t bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
+      <div className="container-inline">
+        <ToggleGroup.Root
+          type="single"
+          value={active}
+          onValueChange={(v) => v && router.push(v)}
+          className="grid h-[var(--bottom-nav-height)] grid-cols-5"
+        >
+          {items.map(({ value, label, icon: Icon }) => (
+            <ToggleGroup.Item
+              key={value}
+              value={value}
               className={clsx(
-                "flex w-full flex-col items-center justify-center gap-1 text-[11px]",
-                active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                "group mx-1 flex items-center justify-center rounded-full text-muted-foreground transition-colors",
+                "data-[state=on]:text-primary-foreground",
+                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                // inner pill background using pseudo-element to allow gradient without affecting layout
+                "relative",
+                "before:absolute before:inset-0 before:-z-10 before:rounded-full before:opacity-0 before:transition-opacity",
+                "data-[state=on]:before:opacity-100 before:[background-image:var(--brand-gradient)]"
               )}
             >
-              <Icon className="size-5" />
-              <span className="leading-none">{label}</span>
-            </Link>
-          );
-        })}
+              <span className="flex items-center gap-1.5 px-3 py-2">
+                <Icon className="size-5" />
+                <span className="text-[11px] leading-none">{label}</span>
+              </span>
+            </ToggleGroup.Item>
+          ))}
+        </ToggleGroup.Root>
       </div>
     </nav>
   );
 }
+
