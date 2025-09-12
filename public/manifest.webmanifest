@@ -1,0 +1,11 @@
+{
+  "name": "강남대학교 축제",
+  "short_name": "강남축제",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ko",
+  "scope": "/",
+  "icons": []
+}
