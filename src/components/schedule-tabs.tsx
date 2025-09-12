@@ -31,7 +31,7 @@ export function ScheduleTabs() {
         <TabsTrigger value="d24">9/24(수)</TabsTrigger>
       </TabsList>
       <TabsContent value="d23" className="space-y-3">
-        <div className="h-[calc(100dvh-56px-64px-env(safe-area-inset-bottom))]">
+        <div className="h-[calc(100dvh-56px-64px-24px-env(safe-area-inset-bottom))]">
           <VerticalTimeline
             fitToParent
             date="2025-09-23"
@@ -45,7 +45,7 @@ export function ScheduleTabs() {
         </div>
       </TabsContent>
       <TabsContent value="d24" className="space-y-3">
-        <div className="h-[calc(100dvh-56px-64px-env(safe-area-inset-bottom))]">
+        <div className="h-[calc(100dvh-56px-64px-24px-env(safe-area-inset-bottom))]">
           <VerticalTimeline
             fitToParent
             date="2025-09-24"

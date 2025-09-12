@@ -48,17 +48,14 @@ export function BottomNav() {
               value={value}
               className={clsx(
                 "group mx-1 flex items-center justify-center rounded-full text-muted-foreground transition-colors",
-                "data-[state=on]:text-primary-foreground",
-                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-                // inner pill background using pseudo-element to allow gradient without affecting layout
-                "relative",
-                "before:absolute before:inset-0 before:-z-10 before:rounded-full before:opacity-0 before:transition-opacity",
-                "data-[state=on]:before:opacity-100 before:[background-image:var(--brand-gradient)]"
+                // Selected: color text/icon with brand, no background
+                "data-[state=on]:text-primary",
+                "focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
               )}
             >
-              <span className="flex items-center gap-1.5 px-3 py-2">
-                <Icon className="size-5" />
-                <span className="text-[11px] leading-none">{label}</span>
+              <span className="flex flex-col items-center gap-1 px-3 py-2">
+                <Icon className="size-5" strokeWidth={active === value ? 2.5 : 2} />
+                <span className="text-[11px] leading-none group-data-[state=on]:font-bold">{label}</span>
               </span>
             </ToggleGroup.Item>
           ))}
@@ -67,4 +64,3 @@ export function BottomNav() {
     </nav>
   );
 }
-
