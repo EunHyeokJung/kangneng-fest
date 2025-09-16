@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useLayoutEffect } from "react";
 import clsx from "clsx";
 
 export type TimelineEvent = {
@@ -53,6 +53,14 @@ export function VerticalTimeline({
     return () => clearInterval(id);
   }, []);
 
+  // Measure synchronously before paint to avoid layout flash when fitToParent
+  useLayoutEffect(() => {
+    if (!fitToParent || !rootEl) return;
+    const h = Math.floor(rootEl.getBoundingClientRect().height);
+    if (h && h !== measuredHeight) setMeasuredHeight(h);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitToParent, rootEl]);
+
   const hours = useMemo(() => {
     return Array.from({ length: endHour - startHour + 1 }, (_, i) => startHour + i);
   }, [startHour, endHour]);
@@ -89,6 +97,9 @@ export function VerticalTimeline({
     return (offset / 60) * finalHourHeight;
   }, [now, date, startHour, totalMinutes, finalHourHeight]);
 
+  const isToday = isSameDateStr(now, date);
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
   return (
     <div ref={setRootEl} className={clsx("h-full rounded-md border bg-card", className)}>
       <div className="relative flex w-full">
@@ -111,14 +122,24 @@ export function VerticalTimeline({
         {/* Right grid and events */}
         <div className="relative grow" style={{ height: containerHeight }}>
           {/* Hour grid lines */}
-          {hours.map((h, idx) => (
+          {hours.map((h, idx) => {
+            // Skip top and bottom — use container border as outer rails
+            if (idx === 0 || idx === hours.length - 1) return null;
+            return (
+              <div
+                key={h}
+                className="absolute left-0 right-0 border-t border-border/60"
+                style={{ top: idx * finalHourHeight }}
+              />
+            );
+          })}
+
+          {/* Half-hour dashed lines */}
+          {Array.from({ length: hoursSpan }, (_, i) => i).map((i) => (
             <div
-              key={h}
-              className={clsx(
-                "absolute left-0 right-0 border-t",
-                idx === 0 ? "border-border" : "border-border/60"
-              )}
-              style={{ top: idx * finalHourHeight }}
+              key={`half-${i}`}
+              className="absolute left-0 right-0 border-t border-dashed border-border/40"
+              style={{ top: i * finalHourHeight + finalHourHeight / 2 }}
             />
           ))}
 
@@ -143,17 +164,33 @@ export function VerticalTimeline({
             const toEnd = Math.min(endHour * 60, endM) - startHour * 60;
             const height = Math.max(16, ((toEnd - fromStart) / 60) * finalHourHeight - 4);
             const top = (fromStart / 60) * finalHourHeight + 2;
+            const ongoing = isToday && nowMinutes >= startM && nowMinutes < endM;
+            const past = isToday && nowMinutes >= endM;
             return (
               <div
                 key={`${ev.title}-${ev.start}`}
-                className="absolute left-2 right-2 overflow-hidden rounded-md border bg-primary/10"
+                className={clsx(
+                  "absolute left-2 right-2 overflow-hidden rounded-md border",
+                  ongoing
+                    ? "border-primary bg-primary/10 shadow-sm"
+                    : past
+                    ? "border-border/60 bg-muted/30 opacity-75"
+                    : "border-border bg-card"
+                )}
                 style={{ top, height }}
               >
                 <div className="flex h-full flex-col justify-center gap-0.5 px-3 py-1.5">
-                  <div className="text-sm font-medium text-primary-foreground/90">
-                    <span className="text-foreground/90">{ev.title}</span>
+                  <div className={clsx("text-sm font-medium", ongoing ? "text-primary" : "text-foreground/90")}
+                  >
+                    {ev.title}
+                    {ongoing && (
+                      <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                        진행중
+                      </span>
+                    )}
                   </div>
-                  <div className="text-[11px] text-muted-foreground">
+                  <div className={clsx("text-[11px]", past ? "text-muted-foreground/70" : "text-muted-foreground")}
+                  >
                     {ev.start} ~ {ev.end}
                     {ev.location ? ` · ${ev.location}` : ""}
                   </div>
